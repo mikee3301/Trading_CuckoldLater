@@ -12,7 +12,6 @@ function validatePercentSum() {
   
   const sum = Per_1 + Per_2 + Per_3 + Per_4 + Per_5;
   
-  // Получаем элементы полей для изменения фона
   const fields = [
     document.getElementById('Percent_1'),
     document.getElementById('Percent_2'),
@@ -24,7 +23,7 @@ function validatePercentSum() {
   if (sum !== 100) {
     fields.forEach(field => field.style.backgroundColor = 'rgba(255, 121, 121, 0.5)');
   } else {
-    fields.forEach(field => field.style.backgroundColor = ''); // Сбрасываем фон, если сумма равна 100
+    fields.forEach(field => field.style.backgroundColor = ''); 
   }
 }
 
@@ -44,7 +43,6 @@ function calculate() {
       });
   });
 
-  // Используем вспомогательную функцию parseNumber
   const Per_1 = parseNumber('Percent_1');
   const Per_2 = parseNumber('Percent_2');
   const Per_3 = parseNumber('Percent_3');
@@ -64,6 +62,11 @@ function calculate() {
   const Depo = parseNumber('Deposit');
   var EP = parseNumber('Entry_price');
   const SL = parseNumber('Stop_loss');
+  
+  const RR_Std = parseNumber('RR_Standard');
+  const SL_Part = parseNumber('StopLossPart');
+  const FixPer = parseNumber('FixedPercent');
+  const toggleSwitch2 = document.getElementById('toggleSwitch2');
   
   const toggleSwitch = document.getElementById('toggleSwitch');
   var StopLossPerc;
@@ -97,7 +100,39 @@ function calculate() {
   const Profit_3 = (EntryVol * Per_3 / 100) * (Math.abs(((Pri_3 - EP) / EP * 100))) / 100;
   const Profit_4 = (EntryVol * Per_4 / 100) * (Math.abs(((Pri_4 - EP) / EP * 100))) / 100;
   const Profit_5 = (EntryVol * Per_5 / 100) * (Math.abs(((Pri_5 - EP) / EP * 100))) / 100;
-
+  
+  
+  var Rcmnd_TP = 0;
+  var Payback = 0;
+  if (EP>SL) {
+    Rcmnd_TP = EP+((EP*StopLossPerc)/100*RR_Std);
+    Payback = EP+(EP*StopLossPerc/100);
+  } else {
+    Rcmnd_TP = EP-((EP*StopLossPerc)/100*RR_Std);
+    Payback = EP-(EP*StopLossPerc/100);
+  }
+  const EP_for_RR = (RR_Std*SL+AVGTP)/(RR_Std+1)
+  
+  var Source_Plus_Minus = 0;
+  if (toggleSwitch2.checked) {
+    Source_Plus_Minus = FixPer;
+  } else {
+    Source_Plus_Minus = StopLossPerc/SL_Part;
+    document.getElementById('FixedPercent').value = Source_Plus_Minus.toFixed(6);
+  }
+  
+  const EP_plus = EP+(EP*Source_Plus_Minus/100);
+  const EP_minus = EP-(EP*Source_Plus_Minus/100);
+  const RR_plus = 1/(Math.abs((EP_plus-SL)/EP_plus*100)/Math.abs(((AVGTP-EP_plus)/EP_plus*100)));
+  const RR_minus = 1/(Math.abs((EP_minus-SL)/EP_minus*100)/Math.abs(((AVGTP-EP_minus)/EP_minus*100)));
+  
+  document.getElementById('Rcmnd_TP').innerText = Rcmnd_TP.toFixed(4);
+  document.getElementById('EP_for_RR').innerText = EP_for_RR.toFixed(4);
+  document.getElementById('Payback').innerText = Payback.toFixed(4);
+  document.getElementById('EP_plus').innerText = EP_plus.toFixed(4);
+  document.getElementById('EP_minus').innerText = EP_minus.toFixed(4);
+  document.getElementById('RR_plus').innerText = RR_plus.toFixed(4);
+  document.getElementById('RR_minus').innerText = RR_minus.toFixed(4);
   
   document.getElementById('StopLossPerc').innerText = StopLossPerc.toFixed(4);
   document.getElementById('EntryVol').innerText = EntryVol.toFixed(4);
@@ -120,17 +155,17 @@ function calculate() {
   document.getElementById('Profit_4').innerText = Profit_4.toFixed(4);
   document.getElementById('Profit_5').innerText = Profit_5.toFixed(4);
 
-  // Вызов функции для проверки суммы Percent_*
+  
   validatePercentSum();
   
-  // Проверяем значение RR
+  
   if (RR < 1) {
     document.getElementById('RR').style.backgroundColor = 'rgba(255, 121, 121, 0.25)';
   } else {
     document.getElementById('RR').style.backgroundColor = ''; 
   }
 }
-// Запуск функции calculate() при изменении значений в полях ввода
+
 document.getElementById('Percent_1').addEventListener('input', calculate);
 document.getElementById('Percent_2').addEventListener('input', calculate);
 document.getElementById('Percent_3').addEventListener('input', calculate);
@@ -151,6 +186,10 @@ document.getElementById('Deposit').addEventListener('input', calculate);
 document.getElementById('Entry_price').addEventListener('input', calculate);
 document.getElementById('Stop_loss').addEventListener('input', calculate);
 
+document.getElementById('RR_Standard').addEventListener('input', calculate);
+document.getElementById('StopLossPart').addEventListener('input', calculate);
+document.getElementById('FixedPercent').addEventListener('input', calculate);
+document.getElementById('toggleSwitch2').addEventListener('change', calculate);
 
 function copyInputValue() {
   const Risk = parseNumber('Risk');
@@ -174,17 +213,14 @@ document.getElementById('copyButton').addEventListener('click', copyInputValue);
 
 
 function DelRec() {
-// Получаем переключатель и элемент .rec
 const toggleSwitch = document.getElementById('toggleSwitch');
 const rec = document.querySelector('.rec');
-// Добавляем обработчик события для переключателя
+
   if (toggleSwitch.checked) {
-    rec.style.display = 'none';  // Скрыть элемент
+    rec.style.display = 'none';
   } else {
-    rec.style.display = 'block';  // Показать элемент 
+    rec.style.display = 'block';
   }
 calculate();
 }
 document.getElementById('toggleSwitch').addEventListener('change', DelRec);
-
-
