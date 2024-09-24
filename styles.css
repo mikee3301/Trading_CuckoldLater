@@ -74,7 +74,10 @@ input::-webkit-inner-spin-button {
   text-align: center;
   line-height: 20px;
   border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.5s ease;
 }
+
 
 #ExitVol_1 {top: 40px; left: 105px;}
 #ExitVol_2 {top: 70px; left: 105px;}
@@ -240,6 +243,7 @@ input:checked + .slider2 {
 input:checked + .slider2:before {
   transform: translateY(38px);
 }
+
 
 @media (min-width: 1280px) {
   .container {
