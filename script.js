@@ -224,3 +224,28 @@ const rec = document.querySelector('.rec');
 calculate();
 }
 document.getElementById('toggleSwitch').addEventListener('change', DelRec);
+
+
+
+function copyToClipboard(text) {
+  const tempInput = document.createElement("input");
+  document.body.appendChild(tempInput);
+  tempInput.value = text;
+  tempInput.select();
+  document.execCommand("copy");
+  document.body.removeChild(tempInput);
+}
+
+document.querySelectorAll('.result').forEach(function (resultField) {
+    resultField.addEventListener('click', function () {
+        const textToCopy = resultField.innerText;
+        copyToClipboard(textToCopy);
+        
+        const originalColor = resultField.style.backgroundColor;
+        resultField.style.backgroundColor = '#515151';
+        
+        setTimeout(function () {
+            resultField.style.backgroundColor = originalColor;
+        }, 300);
+    });
+});
